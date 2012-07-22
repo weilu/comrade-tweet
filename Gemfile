@@ -8,6 +8,7 @@ gem "haml"
 gem 'unicorn'
 gem 'jquery-rails'
 gem 'omniauth-twitter'
+gem 'twitter'
 
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
@@ -20,4 +21,9 @@ group :development, :test do
   gem "capybara"
   gem "factory_girl_rails"
   gem "rspec-rails"
+end
+
+group :test do
+  gem 'webmock'
+  gem 'vcr'
 end
