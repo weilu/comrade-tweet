@@ -1,15 +1,18 @@
-%header
-  %span.user_menu
-    - if current_user
-      Hi, #{current_user.name}
-      = link_to "Sign out", signout_path
-    - else
-      = link_to "Sign in with Twitter", '/auth/twitter'
-
 - if @direct_messages
-  %section
-    %ul
-      - @direct_messages.each do |message|
-        %li
-          %span #{message.text} @#{message.sender.name}
-          %span.timestamp #{message.created_at}
+  - @direct_messages.each do |message|
+    .row-fluid.message
+      - sender = message.sender
+      .span1.profile
+        =image_tag sender.profile_image_url
+      .span11
+        .row
+          .span11
+            %b #{sender.name}
+            @#{sender.screen_name}
+            %span.grey #{time_ago_in_words message.created_at} ago
+        .row
+          .span10
+            #{message.text}
+          .span2
+            %button.btn.btn-success Approve
+            %button.btn.btn-danger Reject

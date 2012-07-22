@@ -9,15 +9,13 @@
     .navbar.navbar-fixed-top
       .navbar-inner
         .container
-          %a.btn.btn-navbar{:"data-toggle" => "collapse", :"data-target" => ".nav-collapse"}
-            %span.icon-bar
-            %span.icon-bar
-            %span.icon-bar
           = link_to("Comrade Tweet", root_path, :class => "brand")
-          -#.nav-collapse
-          -#  %ul.nav
-          -#    %li
-          -#      %a{:href => "https://dev.twitter.com/docs/auth/implementing-sign-twitter"}
-          -#        = t("nav.documentation")
-    .container
+          .pull-right
+            %span.user-menu
+              - if current_user
+                Hi, #{current_user.name}
+                = link_to "Sign out", signout_path
+              - else
+                = link_to "Sign in with Twitter", '/auth/twitter'
+    .container-fluid.main
       = yield
