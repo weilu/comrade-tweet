@@ -8,11 +8,21 @@
         .row
           .span11
             %b #{sender.name}
-            @#{sender.screen_name}
+            %span.sender-handle @#{sender.screen_name}
             %span.grey #{time_ago_in_words message.created_at} ago
         .row
-          .span10
+          .span10.message-body
             #{message.text}
           .span2
             %button.btn.btn-success Approve
             %button.btn.btn-danger Reject
+  .modal.hide.fade.in#moo
+    .modal-header
+      %h3 Share with your followers
+    .modal-body
+      = text_area_tag(:tweet)
+    .modal-footer
+      %a.btn{ data: { dismiss: 'modal'} }
+        Close
+      %a.btn.btn-primary
+        Tweet
