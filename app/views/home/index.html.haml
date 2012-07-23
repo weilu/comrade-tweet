@@ -1,6 +1,6 @@
 - if @direct_messages
   - @direct_messages.each do |message|
-    .row-fluid.message
+    .row-fluid.message{ data: { id: message.id } }
       - sender = message.sender
       .span1.profile
         =image_tag sender.profile_image_url

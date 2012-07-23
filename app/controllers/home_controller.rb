@@ -4,4 +4,21 @@ class HomeController < ApplicationController
       @direct_messages = client.direct_messages
     end
   end
+
+  def approve
+    message = params[:message]
+    #new_tweet = client.update(message)
+
+    original_message_id = params[:id]
+    #mark as approved in db
+
+    render text: 'Mission accomplished!', status: 201
+  end
+
+  def reject
+    original_message_id = params[:id]
+    #mark as rejected in db
+
+    render text: 'Rejected!', status: 200
+  end
 end
