@@ -1,7 +1,9 @@
 class HomeController < ApplicationController
+  MESSAGE_FILTER = Regexp.new /^\{nc\}/
+
   def index
     if session['access_token'] && session['access_secret']
-      @direct_messages = client.direct_messages
+      @direct_messages = client.direct_messages.select{ |m| m['text'] =~ MESSAGE_FILTER }
     end
   end
 
