@@ -3,7 +3,9 @@ class HomeController < ApplicationController
 
   def index
     if session['access_token'] && session['access_secret']
-      @direct_messages = client.direct_messages.select{ |m| m['text'] =~ MESSAGE_FILTER }
+      most_recent_message_id = Message.maximum(:twitter_id).to_i
+      @direct_messages = client.direct_messages(since_id: most_recent_message_id).select{ |m| m['text'] =~ MESSAGE_FILTER }
+      save_messages_and_senders
     end
   end
 
@@ -22,5 +24,22 @@ class HomeController < ApplicationController
     #mark as rejected in db
 
     render text: 'Rejected!', status: 200
+  end
+
+  private
+  def save_messages_and_senders
+    @direct_messages.each do |dm|
+      message = Message.new
+      message.twitter_id = dm['id_str']
+      message.text = dm['text']
+      message.created_at = dm['created_at']
+
+      sender = dm['sender']
+      options = { screen_name: sender['screen_name'],
+                  name: sender['name'],
+                  profile_image_url: sender['profile_image_url'] }
+      message.sender = Sender.find_or_create_by_twitter_id(sender['id_str'], options)
+      message.save
+    end
   end
 end
