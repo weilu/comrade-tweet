@@ -30,7 +30,7 @@ class HomeController < ApplicationController
   def save_messages_and_senders
     @direct_messages.each do |dm|
       message = Message.new
-      message.twitter_id = dm['id_str']
+      message.twitter_id = dm['id'].to_s
       message.text = dm['text']
       message.created_at = dm['created_at']
 
@@ -38,7 +38,7 @@ class HomeController < ApplicationController
       options = { screen_name: sender['screen_name'],
                   name: sender['name'],
                   profile_image_url: sender['profile_image_url'] }
-      message.sender = Sender.find_or_create_by_twitter_id(sender['id_str'], options)
+      message.sender = Sender.find_or_create_by_twitter_id(sender['id'].to_s, options)
 
       message.user = current_user
       message.save
