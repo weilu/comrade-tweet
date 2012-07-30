@@ -3,7 +3,7 @@ class HomeController < ApplicationController
 
   def index
     if session['access_token'] && session['access_secret']
-      most_recent_message_id = Message.maximum(:twitter_id).to_i
+      most_recent_message_id = current_user.messages.maximum(:twitter_id).to_i
       @direct_messages = client.direct_messages(since_id: most_recent_message_id).select{ |m| m['text'] =~ MESSAGE_FILTER }
       save_messages_and_senders
     end
@@ -39,6 +39,8 @@ class HomeController < ApplicationController
                   name: sender['name'],
                   profile_image_url: sender['profile_image_url'] }
       message.sender = Sender.find_or_create_by_twitter_id(sender['id_str'], options)
+
+      message.user = current_user
       message.save
     end
   end

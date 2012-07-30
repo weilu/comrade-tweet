@@ -4,6 +4,7 @@ describe Message do
   before { FactoryGirl.create(:message) }
 
   it { should belong_to(:sender) }
+  it { should belong_to(:user) }
 
   it { should validate_presence_of(:text) }
   it { should validate_presence_of(:created_at) }

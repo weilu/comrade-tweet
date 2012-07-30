@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120723143907) do
+ActiveRecord::Schema.define(:version => 20120730171631) do
 
   create_table "messages", :force => true do |t|
     t.string   "twitter_id"
@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(:version => 20120723143907) do
     t.datetime "created_at"
     t.integer  "sender_id"
     t.string   "status"
+    t.integer  "user_id"
   end
 
   create_table "senders", :force => true do |t|
