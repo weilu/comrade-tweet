@@ -4,8 +4,10 @@ class HomeController < ApplicationController
   def index
     if session['access_token'] && session['access_secret']
       most_recent_message_id = current_user.messages.maximum(:twitter_id)
-      @direct_messages = client.direct_messages(since_id: most_recent_message_id).select{ |m| m['text'] =~ MESSAGE_FILTER }
-      save_messages_and_senders
+      new_messages = client.direct_messages(since_id: most_recent_message_id).select{ |m| m['text'] =~ MESSAGE_FILTER }
+      save_messages_and_senders new_messages
+
+      @direct_messages = current_user.messages.where(status: MessageStatus::PENDING)
     end
   end
 
@@ -27,12 +29,13 @@ class HomeController < ApplicationController
   end
 
   private
-  def save_messages_and_senders
-    @direct_messages.each do |dm|
+  def save_messages_and_senders twitter_messages
+    twitter_messages.each do |dm|
       message = Message.new
       message.twitter_id = dm['id']
       message.text = dm['text']
       message.created_at = dm['created_at']
+      message.status = MessageStatus::PENDING
 
       sender = dm['sender']
       options = { screen_name: sender['screen_name'],

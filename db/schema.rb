@@ -11,15 +11,15 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120731120158) do
+ActiveRecord::Schema.define(:version => 20120731131129) do
 
   create_table "messages", :force => true do |t|
     t.string   "text"
     t.datetime "created_at"
     t.integer  "sender_id"
-    t.string   "status"
     t.integer  "user_id"
     t.integer  "twitter_id", :limit => 8
+    t.integer  "status",     :limit => 2
   end
 
   create_table "senders", :force => true do |t|

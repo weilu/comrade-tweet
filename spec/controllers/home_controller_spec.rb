@@ -9,6 +9,8 @@ describe HomeController do
       messages_filename = Rails.root.join('spec', 'fixtures', 'messages.json')
       File.open(messages_filename) { |f| JSON.load f }
     }
+    let(:filtered_messages) { all_messages.select { |m| m['text'].match(/^\{nc\}/) } }
+
     let(:fake_client) { double(:twitter_client).as_null_object }
 
     before do
@@ -33,23 +35,31 @@ describe HomeController do
       get :index
     end
 
-    it 'filters the direct messages with predefined regex' do
-      direct_messages = assigns(:direct_messages)
-      expect(direct_messages).to eq all_messages.select{ |m| m['text'].match(/^\{nc\}/) }
-    end
-
     it 'stores filtered messages and senders in the database' do
-      direct_messages = assigns(:direct_messages)
-      direct_message_ids = direct_messages.map{ |m| m['id'] }
+      direct_message_ids = filtered_messages.map{ |m| m['id'] }
       new_messages = Message.limit(2).order('twitter_id desc')
 
       expect(new_messages.map(&:twitter_id)).to match_array(direct_message_ids)
       expect(new_messages.map(&:user).uniq).to eq [ current_user ]
+      expect(new_messages.map(&:status).uniq).to eq [ MessageStatus::PENDING ]
 
-      sender_ids = direct_messages.map{ |m| m['sender']['id'] }
+      sender_ids = filtered_messages.map{ |m| m['sender']['id'] }
       senders = new_messages.map(&:sender)
       expect(senders.map(&:persisted?).uniq).to eq [ true ]
       expect(senders.map(&:twitter_id)).to match_array(sender_ids)
+    end
+
+    it "assigns direct_messages with current user's pending messages" do
+      Message.destroy_all
+      pending_message = FactoryGirl.create(:message, twitter_id: 1234567, status: MessageStatus::PENDING, user: current_user)
+      other_message = FactoryGirl.create(:message, twitter_id: 2234569, status: MessageStatus::PENDING)
+
+      get :index
+      direct_messages = assigns(:direct_messages).to_a
+
+      expect(direct_messages.count).to eq 3
+      expect(direct_messages).to include(pending_message)
+      expect(direct_messages).not_to include(other_message)
     end
 
   end
