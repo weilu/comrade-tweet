@@ -12,18 +12,16 @@ class HomeController < ApplicationController
   end
 
   def approve
-    message = params[:message]
-    #new_tweet = client.update(message)
-
-    original_message_id = params[:id]
-    #mark as approved in db
+    message = Message.find params[:id]
+    client.update(message.text)
+    message.update_attribute(:status, MessageStatus::APPROVED)
 
     render text: 'Mission accomplished!', status: 201
   end
 
   def reject
-    original_message_id = params[:id]
-    #mark as rejected in db
+    message = Message.find params[:id]
+    message.update_attribute(:status, MessageStatus::REJECTED)
 
     render text: 'Rejected!', status: 200
   end

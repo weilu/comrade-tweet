@@ -3,6 +3,15 @@ require 'spec_helper'
 describe HomeController do
 
   let(:current_user) { FactoryGirl.create(:user) }
+  let(:fake_client) { double(:twitter_client).as_null_object }
+
+  before do
+    fake_credentials = {'access_token' => 'fake_access_token',
+                        'access_secret' => 'fake_access_secret'}
+    controller.stub(:session).and_return fake_credentials
+    controller.stub(:current_user).and_return current_user
+    controller.stub_chain(:client).and_return(fake_client)
+  end
 
   describe '#index' do
     let(:all_messages) {
@@ -11,14 +20,7 @@ describe HomeController do
     }
     let(:filtered_messages) { all_messages.select { |m| m['text'].match(/^\{nc\}/) } }
 
-    let(:fake_client) { double(:twitter_client).as_null_object }
-
     before do
-      fake_credentials = {'access_token' => 'fake_access_token',
-                          'access_secret' => 'fake_access_secret'}
-      controller.stub(:session).and_return fake_credentials
-      controller.stub(:current_user).and_return current_user
-      controller.stub_chain(:client).and_return(fake_client)
       fake_client.stub(:direct_messages).and_return(all_messages)
 
       get :index
@@ -65,8 +67,30 @@ describe HomeController do
   end
 
   describe '#approve' do
-    it 'sends a tweet to twitter'
-    it 'marks the message as approved in db'
+    let(:message) { FactoryGirl.create(:message, status: MessageStatus::PENDING) }
+
+    it 'sends a tweet to twitter' do
+      fake_client.should_receive(:update).with message.text
+      post :approve, id: message.id
+    end
+
+    it 'marks the message as approved in db' do
+      post :approve, id: message.id
+      expect(Message.find(message.id).status).to eq MessageStatus::APPROVED
+    end
   end
 
+  describe '#reject' do
+    let(:message) { FactoryGirl.create(:message, status: MessageStatus::PENDING) }
+
+    it 'does not send a tweet to twitter' do
+      fake_client.should_not_receive(:update)
+      post :reject, id: message.id
+    end
+
+    it 'marks the message as rejected in db' do
+      post :reject, id: message.id
+      expect(Message.find(message.id).status).to eq MessageStatus::REJECTED
+    end
+  end
 end
