@@ -2,7 +2,7 @@
 
 FactoryGirl.define do
   factory :message do
-    twitter_id { Faker::Name.name.parameterize }
+    sequence(:twitter_id)
     text { Faker::Lorem.sentence }
     created_at { Time.now }
   end

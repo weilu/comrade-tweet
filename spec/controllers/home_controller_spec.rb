@@ -26,8 +26,8 @@ describe HomeController do
 
     it "queries twitter for direct messages that are newer than the user's newest dm in db" do
       Message.destroy_all
-      FactoryGirl.create(:message, twitter_id: '1234567', user: current_user)
-      FactoryGirl.create(:message, twitter_id: '2234569')
+      FactoryGirl.create(:message, twitter_id: 1234567, user: current_user)
+      FactoryGirl.create(:message, twitter_id: 2234569)
       fake_client.should_receive(:direct_messages).with(since_id: 1234567)
 
       get :index
@@ -40,13 +40,13 @@ describe HomeController do
 
     it 'stores filtered messages and senders in the database' do
       direct_messages = assigns(:direct_messages)
-      direct_message_ids = direct_messages.map{ |m| m['id_str'] }
+      direct_message_ids = direct_messages.map{ |m| m['id'] }
       new_messages = Message.limit(2).order('twitter_id desc')
 
       expect(new_messages.map(&:twitter_id)).to match_array(direct_message_ids)
       expect(new_messages.map(&:user).uniq).to eq [ current_user ]
 
-      sender_ids = direct_messages.map{ |m| m['sender']['id_str'] }
+      sender_ids = direct_messages.map{ |m| m['sender']['id'] }
       senders = new_messages.map(&:sender)
       expect(senders.map(&:persisted?).uniq).to eq [ true ]
       expect(senders.map(&:twitter_id)).to match_array(sender_ids)
