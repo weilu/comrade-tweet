@@ -28,3 +28,7 @@ group :test do
   gem 'webmock'
   gem 'shoulda-matchers'
 end
+
+group :development do
+  gem 'heroku'
+end
