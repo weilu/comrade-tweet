@@ -16,6 +16,6 @@
                 Hi, #{current_user.name}
                 = link_to "Sign out", signout_path
               - else
-                = link_to "Sign in with Twitter", '/auth/twitter'
+                = link_to "Sign in with Twitter", "/auth/twitter?use_authorize=true"
     .container-fluid.main
       = yield
