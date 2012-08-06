@@ -68,14 +68,15 @@ describe HomeController do
 
   describe '#approve' do
     let(:message) { FactoryGirl.create(:message, status: MessageStatus::PENDING) }
+    let(:tweet_text) { "#{message.text} via boo" }
 
     it 'sends a tweet to twitter' do
-      fake_client.should_receive(:update).with message.text
-      post :approve, id: message.id
+      fake_client.should_receive(:update).with tweet_text
+      post :approve, id: message.id, text: tweet_text
     end
 
     it 'marks the message as approved in db' do
-      post :approve, id: message.id
+      post :approve, id: message.id, text: tweet_text
       expect(Message.find(message.id).status).to eq MessageStatus::APPROVED
     end
   end

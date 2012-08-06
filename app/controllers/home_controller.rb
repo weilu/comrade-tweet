@@ -13,7 +13,8 @@ class HomeController < ApplicationController
 
   def approve
     message = Message.find params[:id]
-    client.update(message.text)
+    tweet_text = params[:text]
+    client.update(tweet_text)
     message.update_attribute(:status, MessageStatus::APPROVED)
 
     render text: 'Mission accomplished!', status: 201

@@ -32,7 +32,7 @@ $(->
     $.ajax({
       url: '/approve',
       type: 'POST',
-      data: { id: window.comrade.current_message.data().id },
+      data: { id: window.comrade.current_message.data().id, text: $('#moo .modal-body textarea').val() },
       success: (data) ->
         window.comrade.hide_current = true
         $('#moo').modal('hide')
