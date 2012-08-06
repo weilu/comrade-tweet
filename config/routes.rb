@@ -6,4 +6,6 @@ ComradeTweet::Application.routes.draw do
 
   match '/approve', to: 'home#approve', via: [:post]
   match '/reject', to: 'home#reject', via: [:post]
+
+  resources :users, :only => [:edit, :update]
 end

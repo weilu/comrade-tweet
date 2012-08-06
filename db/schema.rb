@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120731131129) do
+ActiveRecord::Schema.define(:version => 20120806141552) do
 
   create_table "messages", :force => true do |t|
     t.string   "text"
@@ -33,8 +33,9 @@ ActiveRecord::Schema.define(:version => 20120731131129) do
     t.string   "provider"
     t.string   "uid"
     t.string   "name"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+    t.string   "filter_regex"
   end
 
 end
