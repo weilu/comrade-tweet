@@ -12,4 +12,12 @@ class User < ActiveRecord::Base
       user.name = auth['info']['nickname']
     end
   end
+
+  def last_stored_message_id
+    messages.maximum(:twitter_id)
+  end
+
+  def pending_messages
+    messages.where(status: MessageStatus::PENDING)
+  end
 end

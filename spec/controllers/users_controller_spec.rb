@@ -23,9 +23,17 @@ describe UsersController do
   end
 
   describe '#update' do
+    subject(:update_filter) { put :update, user: {filter_regex: 'nc'} }
+
     it "updates the user's regex filter" do
-      put :update, user: { filter_regex: 'nc' }
+      update_filter
       expect(current_user.reload.filter_regex).to eq 'nc'
+    end
+
+    it "deletes user's stored messages" do
+      FactoryGirl.create_list(:message, 2, user: current_user)
+      update_filter
+      expect(current_user.messages.count).to  eq 0
     end
   end
 

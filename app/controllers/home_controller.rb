@@ -1,13 +1,9 @@
 class HomeController < ApplicationController
-  MESSAGE_FILTER = Regexp.new /^\{nc\}/
 
   def index
     if session['access_token'] && session['access_secret']
-      most_recent_message_id = current_user.messages.maximum(:twitter_id)
-      new_messages = client.direct_messages(since_id: most_recent_message_id).select{ |m| m['text'] =~ MESSAGE_FILTER }
-      save_messages_and_senders new_messages
-
-      @direct_messages = current_user.messages.where(status: MessageStatus::PENDING)
+      save_messages_and_senders filtered_messages
+      @direct_messages = current_user.pending_messages
     end
   end
 
@@ -28,6 +24,14 @@ class HomeController < ApplicationController
   end
 
   private
+  def filtered_messages
+    new_messages.select{ |m| m['text'] =~ /#{current_user.filter_regex}/ }
+  end
+
+  def new_messages
+    client.direct_messages(since_id: current_user.last_stored_message_id)
+  end
+
   def save_messages_and_senders twitter_messages
     twitter_messages.each do |dm|
       message = Message.new

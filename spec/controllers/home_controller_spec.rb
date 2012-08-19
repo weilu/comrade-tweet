@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe HomeController do
 
-  let(:current_user) { FactoryGirl.create(:user) }
+  let(:current_user) { FactoryGirl.create(:user, filter_regex: '^\{nc\}') }
   let(:fake_client) { double(:twitter_client).as_null_object }
 
   before do
@@ -18,7 +18,7 @@ describe HomeController do
       messages_filename = Rails.root.join('spec', 'fixtures', 'messages.json')
       File.open(messages_filename) { |f| JSON.load f }
     }
-    let(:filtered_messages) { all_messages.select { |m| m['text'].match(/^\{nc\}/) } }
+    let(:filtered_messages) { all_messages.select { |m| m['text'].match(/#{current_user.filter_regex}/) } }
 
     before do
       fake_client.stub(:direct_messages).and_return(all_messages)
