@@ -6,7 +6,7 @@ class UsersController < ApplicationController
   def update
     current_user.filter_regex = params[:user][:filter_regex]
     if current_user.save
-      current_user.messages.delete_all
+      current_user.messages.destroy_all
       flash[:notice] = 'Filter updated'
     else
       flash[:warning] = 'Failed to update filter'

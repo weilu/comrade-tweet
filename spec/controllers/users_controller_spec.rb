@@ -30,9 +30,12 @@ describe UsersController do
       expect(current_user.reload.filter_regex).to eq 'nc'
     end
 
-    it "deletes user's stored messages" do
+    it "destroys user's stored messages" do
       FactoryGirl.create_list(:message, 2, user: current_user)
-      update_filter
+      expect{
+        update_filter
+      }.to change(Message, :count).by(-2)
+
       expect(current_user.messages.count).to  eq 0
     end
   end
