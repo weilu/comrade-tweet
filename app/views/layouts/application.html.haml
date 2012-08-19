@@ -11,10 +11,11 @@
         .container
           = link_to("Comrade Tweet", root_path, :class => "brand")
           .nav-collapse
-            %ul.nav
-              - active = current_page?(edit_user_path(current_user)) ? 'active' : ''
-              %li{ :class => active }
-                = link_to 'Settings', edit_user_path(current_user)
+            - if current_user
+              %ul.nav
+                - active = current_page?(edit_user_path(current_user)) ? 'active' : ''
+                %li{ :class => active }
+                  = link_to 'Settings', edit_user_path(current_user)
           .pull-right
             %span.user-menu
               - if current_user
