@@ -19,7 +19,7 @@
             = "@#{current_user.name}"
     %fieldset
       .control-group
-        = f.label :filter_regex, nil, class: 'control-label'
+        = f.label :filter_regex, 'Filter regex (only applied on DM)', class: 'control-label'
         .controls
           = f.text_field :filter_regex
         = f.submit 'Update', class: 'btn'
