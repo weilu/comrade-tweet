@@ -13,39 +13,45 @@ describe HomeController do
     controller.stub_chain(:client).and_return(fake_client)
   end
 
+  def parse_fixtures file_name
+    File.open(Rails.root.join('spec', 'fixtures', file_name)) { |f| JSON.load f }
+  end
+
   describe '#index' do
-    let(:all_messages) {
-      messages_filename = Rails.root.join('spec', 'fixtures', 'messages.json')
-      File.open(messages_filename) { |f| JSON.load f }
-    }
-    let(:filtered_messages) { all_messages.select { |m| m['text'].match(/#{current_user.filter_regex}/) } }
+    let(:all_messages) { parse_fixtures 'messages.json' }
+    let(:all_mentions) { parse_fixtures 'mentions.json' }
+    let(:filtered_messages) { (all_messages + all_mentions).select { |m| m['text'].match(/#{current_user.filter_regex}/) } }
 
     before do
       fake_client.stub(:direct_messages).and_return(all_messages)
-
-      get :index
+      fake_client.stub(:mentions_timeline).and_return(all_mentions)
     end
 
-    it { should respond_with(:success) }
+    subject(:do_request) { get :index }
+
+    it { should be_success }
 
     it "queries twitter for direct messages that are newer than the user's newest dm in db" do
       Message.destroy_all
       FactoryGirl.create(:message, twitter_id: 1234567, user: current_user)
       FactoryGirl.create(:message, twitter_id: 2234569)
       fake_client.should_receive(:direct_messages).with(since_id: 1234567)
+      fake_client.should_receive(:mentions_timeline).with(since_id: 1234567)
 
-      get :index
+      do_request
     end
 
     it 'stores filtered messages and senders in the database' do
-      direct_message_ids = filtered_messages.map{ |m| m['id'] }
-      new_messages = Message.limit(2).order('twitter_id desc')
+      do_request
 
-      expect(new_messages.map(&:twitter_id)).to match_array(direct_message_ids)
+      message_ids = filtered_messages.map{ |m| m['id'] }
+      new_messages = Message.limit(3).order('twitter_id desc')
+
+      expect(new_messages.map(&:twitter_id)).to match_array(message_ids)
       expect(new_messages.map(&:user).uniq).to eq [ current_user ]
       expect(new_messages.map(&:status).uniq).to eq [ MessageStatus::PENDING ]
 
-      sender_ids = filtered_messages.map{ |m| m['sender']['id'] }
+      sender_ids = filtered_messages.map{ |m| m['sender'].present? ? m['sender']['id'] : m['user']['id'] }
       senders = new_messages.map(&:sender)
       expect(senders.map(&:persisted?).uniq).to eq [ true ]
       expect(senders.map(&:twitter_id)).to match_array(sender_ids)
@@ -56,14 +62,13 @@ describe HomeController do
       pending_message = FactoryGirl.create(:message, twitter_id: 1234567, status: MessageStatus::PENDING, user: current_user)
       other_message = FactoryGirl.create(:message, twitter_id: 2234569, status: MessageStatus::PENDING)
 
-      get :index
+      do_request
       direct_messages = assigns(:direct_messages).to_a
 
-      expect(direct_messages.count).to eq 3
+      expect(direct_messages.count).to eq 4
       expect(direct_messages).to include(pending_message)
       expect(direct_messages).not_to include(other_message)
     end
-
   end
 
   describe '#approve' do

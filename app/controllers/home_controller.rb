@@ -25,11 +25,15 @@ class HomeController < ApplicationController
 
   private
   def filtered_messages
-    new_messages.select{ |m| m['text'] =~ /#{current_user.filter_regex}/ }
+    (new_messages + new_mentions).select{ |m| m['text'] =~ /#{current_user.filter_regex}/ }
   end
 
   def new_messages
     client.direct_messages(since_id: current_user.last_stored_message_id)
+  end
+
+  def new_mentions
+    client.mentions_timeline(since_id: current_user.last_stored_message_id)
   end
 
   def save_messages_and_senders twitter_messages
@@ -40,7 +44,7 @@ class HomeController < ApplicationController
       message.created_at = dm['created_at']
       message.status = MessageStatus::PENDING
 
-      sender = dm['sender']
+      sender = dm['sender'] || dm['user']
       options = { screen_name: sender['screen_name'],
                   name: sender['name'],
                   profile_image_url: sender['profile_image_url'] }
