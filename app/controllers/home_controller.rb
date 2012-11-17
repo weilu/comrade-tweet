@@ -25,7 +25,7 @@ class HomeController < ApplicationController
 
   private
   def filtered_messages
-    (new_messages + new_mentions).select{ |m| m['text'] =~ /#{current_user.filter_regex}/ }
+    new_mentions + new_messages.select{ |m| m['text'] =~ /#{current_user.filter_regex}/ }
   end
 
   def new_messages

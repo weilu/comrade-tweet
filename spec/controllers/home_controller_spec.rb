@@ -20,7 +20,7 @@ describe HomeController do
   describe '#index' do
     let(:all_messages) { parse_fixtures 'messages.json' }
     let(:all_mentions) { parse_fixtures 'mentions.json' }
-    let(:filtered_messages) { (all_messages + all_mentions).select { |m| m['text'].match(/#{current_user.filter_regex}/) } }
+    let(:filtered_messages) { all_mentions + all_messages.select { |m| m['text'].match(/#{current_user.filter_regex}/) } }
 
     before do
       fake_client.stub(:direct_messages).and_return(all_messages)
@@ -45,7 +45,7 @@ describe HomeController do
       do_request
 
       message_ids = filtered_messages.map{ |m| m['id'] }
-      new_messages = Message.limit(3).order('twitter_id desc')
+      new_messages = Message.limit(4).order('twitter_id desc')
 
       expect(new_messages.map(&:twitter_id)).to match_array(message_ids)
       expect(new_messages.map(&:user).uniq).to eq [ current_user ]
@@ -65,7 +65,7 @@ describe HomeController do
       do_request
       direct_messages = assigns(:direct_messages).to_a
 
-      expect(direct_messages.count).to eq 4
+      expect(direct_messages.count).to eq 5
       expect(direct_messages).to include(pending_message)
       expect(direct_messages).not_to include(other_message)
     end
