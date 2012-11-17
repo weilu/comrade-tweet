@@ -10,7 +10,7 @@
       .navbar-inner
         .container
           = link_to("Comrade Tweet", root_path, :class => "brand")
-          .nav-collapse
+          %div
             - if current_user
               %ul.nav
                 - active = current_page?(edit_user_path(current_user)) ? 'active' : ''
@@ -23,5 +23,5 @@
                 = link_to "Sign out", signout_path
               - else
                 = link_to "Sign in with Twitter", "/auth/twitter?use_authorize=true"
-    .container-fluid.main.well
+    .container.main.well
       = yield

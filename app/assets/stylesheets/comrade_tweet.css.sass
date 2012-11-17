@@ -1,11 +1,22 @@
-.row-fluid.message
+body
+  background: image-url('camouflage.png')
+
+.row.message
   border-bottom: 1px solid lightgrey
   padding: 10px 0
+  position: relative
 
-.container-fluid.main
-  margin: 0 20px 20px
+.profile
+  text-align: center
+
+  img
+    width: 48px
+    height: 48px
+
+.container.main
   border: 1px solid lightgrey
   border-radius: 5px
+  background: rgba(255, 255, 255, 0.96)
 
 #moo
   textarea
@@ -18,5 +29,17 @@
 .grey
   color: grey
 
+a:focus
+  outline: none
+
 label
   font-weight: bold
+
+@media(max-width: 767px)
+  .profile
+    text-align: left
+  .buttons
+    text-align: right
+    position: absolute
+    top: 10px
+    right: 0

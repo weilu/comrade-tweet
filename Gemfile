@@ -1,6 +1,6 @@
 source :rubygems
 
-gem 'rails', '3.2.5'
+gem 'rails', '3.2.9'
 
 gem 'pg'
 gem "sass"
@@ -14,7 +14,7 @@ group :assets do
   gem 'sass-rails',   '~> 3.2.3'
   gem 'coffee-rails', '~> 3.2.1'
   gem 'uglifier'
-  gem "twitter-bootstrap-rails"
+  gem "twitter-bootstrap-rails", '2.1.5'
 end
 
 group :development, :test do

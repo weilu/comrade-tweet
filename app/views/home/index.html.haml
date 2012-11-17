@@ -1,21 +1,20 @@
 - if @direct_messages
   - @direct_messages.each do |message|
-    .row-fluid.message{ data: { id: message.id } }
+    .row.message{ data: { id: message.id } }
       - sender = message.sender
       .span1.profile
         =image_tag sender.profile_image_url
-      .span11
+      .span9
         .row
-          .span11
-            %b #{sender.name}
-            %span.sender-handle @#{sender.screen_name}
-            %span.grey #{time_ago_in_words message.created_at} ago
+          %b #{sender.name}
+          %span.sender-handle @#{sender.screen_name}
+          %span.grey #{time_ago_in_words message.created_at} ago
         .row
-          .span10.message-body
+          .message-body
             #{message.text}
-          .span2
-            %button.btn.btn-success Approve
-            %button.btn.btn-danger Reject
+      .span2.buttons
+        %button.btn.btn-success Approve
+        %button.btn.btn-danger Reject
   .modal.hide.fade.in#moo
     .modal-header
       %h3 Share with your followers
