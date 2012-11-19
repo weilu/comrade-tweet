@@ -37,21 +37,6 @@ class HomeController < ApplicationController
   end
 
   def save_messages_and_senders twitter_messages
-    twitter_messages.each do |dm|
-      message = Message.new
-      message.twitter_id = dm['id']
-      message.text = dm['text']
-      message.created_at = dm['created_at']
-      message.status = MessageStatus::PENDING
-
-      sender = dm['sender'] || dm['user']
-      options = { screen_name: sender['screen_name'],
-                  name: sender['name'],
-                  profile_image_url: sender['profile_image_url'] }
-      message.sender = Sender.find_or_create_by_twitter_id(sender['id'], options)
-
-      message.user = current_user
-      message.save
-    end
+    twitter_messages.each { |m| Message.create_from_tweet_for_user m, current_user }
   end
 end
