@@ -17,7 +17,7 @@ class User < ActiveRecord::Base
     messages.maximum(:twitter_id)
   end
 
-  def pending_messages
-    messages.where(status: MessageStatus::PENDING)
+  def sorted_pending_messages
+    messages.pending.order("created_at DESC")
   end
 end

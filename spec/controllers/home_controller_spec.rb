@@ -57,7 +57,7 @@ describe HomeController do
       expect(senders.map(&:twitter_id)).to match_array(sender_ids)
     end
 
-    it "assigns direct_messages with current user's pending messages" do
+    it "assigns direct_messages with current user's sorted pending messages" do
       Message.destroy_all
       pending_message = FactoryGirl.create(:message, twitter_id: 1234567, status: MessageStatus::PENDING, user: current_user)
       other_message = FactoryGirl.create(:message, twitter_id: 2234569, status: MessageStatus::PENDING)
@@ -66,7 +66,7 @@ describe HomeController do
       direct_messages = assigns(:direct_messages).to_a
 
       expect(direct_messages.count).to eq 5
-      expect(direct_messages).to include(pending_message)
+      expect(direct_messages.first).to eq(pending_message)
       expect(direct_messages).not_to include(other_message)
     end
   end

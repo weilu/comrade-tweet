@@ -3,7 +3,7 @@ class HomeController < ApplicationController
   def index
     if session['access_token'] && session['access_secret']
       save_messages_and_senders filtered_messages
-      @direct_messages = current_user.pending_messages
+      @direct_messages = current_user.sorted_pending_messages
     end
   end
 

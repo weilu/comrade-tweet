@@ -5,6 +5,8 @@ class Message < ActiveRecord::Base
   validates_presence_of :text, :created_at, :twitter_id
   validates_uniqueness_of :twitter_id
 
+  scope :pending, where(status: MessageStatus::PENDING)
+
   def self.create_from_tweet_for_user tweet, user
     message = Message.new
     message.twitter_id = tweet['id']
