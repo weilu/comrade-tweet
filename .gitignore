@@ -16,3 +16,6 @@
 
 # Ignore rubymine's crap
 /.idea
+
+# Ignore .DS_Store
+.DS_Store
