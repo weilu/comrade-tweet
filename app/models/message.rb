@@ -14,9 +14,8 @@ class Message < ActiveRecord::Base
     message.created_at = tweet['created_at']
     message.status = MessageStatus::PENDING
 
-    sender = tweet['sender'] || tweet['user']
-    options = sender.slice('screen_name', 'name', 'profile_image_url')
-    message.sender = Sender.find_or_create_by_twitter_id(sender['id'], options)
+    sender = (tweet['sender'] || tweet['user']).to_hash
+    message.sender = Sender.create_from_twitter_user sender
 
     message.user = user
     message.save

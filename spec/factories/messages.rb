@@ -5,5 +5,9 @@ FactoryGirl.define do
     sequence(:twitter_id)
     text { Faker::Lorem.sentence }
     created_at { Time.now }
+
+    trait :pending do |message|
+      message.status MessageStatus::PENDING
+    end
   end
 end

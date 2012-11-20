@@ -25,6 +25,7 @@ describe HomeController do
     before do
       fake_client.stub(:direct_messages).and_return(all_messages)
       fake_client.stub(:mentions_timeline).and_return(all_mentions)
+      Message.stub(:create_from_tweet_for_user)
     end
 
     subject(:do_request) { get :index }
@@ -42,32 +43,23 @@ describe HomeController do
     end
 
     it 'stores filtered messages and senders in the database' do
+      filtered_messages.each do |m|
+        Message.should_receive(:create_from_tweet_for_user).with(m, current_user)
+      end
+
       do_request
-
-      message_ids = filtered_messages.map{ |m| m['id'] }
-      new_messages = Message.limit(4).order('twitter_id desc')
-
-      expect(new_messages.map(&:twitter_id)).to match_array(message_ids)
-      expect(new_messages.map(&:user).uniq).to eq [ current_user ]
-      expect(new_messages.map(&:status).uniq).to eq [ MessageStatus::PENDING ]
-
-      sender_ids = filtered_messages.map{ |m| m['sender'].present? ? m['sender']['id'] : m['user']['id'] }
-      senders = new_messages.map(&:sender)
-      expect(senders.map(&:persisted?).uniq).to eq [ true ]
-      expect(senders.map(&:twitter_id)).to match_array(sender_ids)
     end
 
     it "assigns direct_messages with current user's sorted pending messages" do
       Message.destroy_all
-      pending_message = FactoryGirl.create(:message, twitter_id: 1234567, status: MessageStatus::PENDING, user: current_user)
-      other_message = FactoryGirl.create(:message, twitter_id: 2234569, status: MessageStatus::PENDING)
+      early_pending_message = FactoryGirl.create(:message, :pending, created_at: 2.days.ago, user: current_user)
+      pending_message = FactoryGirl.create(:message, :pending, user: current_user)
+      other_message = FactoryGirl.create(:message, :pending)
 
       do_request
       direct_messages = assigns(:direct_messages).to_a
 
-      expect(direct_messages.count).to eq 5
-      expect(direct_messages.first).to eq(pending_message)
-      expect(direct_messages).not_to include(other_message)
+      expect(direct_messages).to eq([pending_message, early_pending_message])
     end
   end
 
