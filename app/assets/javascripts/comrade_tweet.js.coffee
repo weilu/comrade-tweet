@@ -11,8 +11,8 @@ $(->
     attribution = ' via ' + $('.sender-handle', window.comrade.current_message).text()
 
     $('#moo .modal-body textarea').val(originalMessage + attribution)
-
     $('#moo').modal()
+    countDown()
   )
 
   $('.btn-danger').on('click', ->
@@ -44,4 +44,12 @@ $(->
       window.comrade.current_message.fadeOut('slow')
       window.comrade.reset()
   )
+
+  countDown = ->
+    charLeft = 140 - $('textarea').val().length
+    $('#moo #count').text(charLeft)
+    color = if charLeft < 1 then 'red' else 'black'
+    $('#moo #count').css('color', color)
+
+  $('#moo textarea').on('keyup', countDown)
 )
