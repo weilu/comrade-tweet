@@ -29,14 +29,20 @@ class HomeController < ApplicationController
   end
 
   def new_messages
-    client.direct_messages(since_id: current_user.last_stored_message_id, count: 200)
+    client.direct_messages options
   end
 
   def new_mentions
-    client.mentions_timeline(since_id: current_user.last_stored_message_id, count: 200)
+    client.mentions_timeline options
   end
 
   def save_messages_and_senders twitter_messages
     twitter_messages.each { |m| Message.create_from_tweet_for_user m, current_user }
+  end
+
+  def options
+    options = {count: 200}
+    options.merge!({ since_id: current_user.last_stored_message_id }) if current_user.last_stored_message_id
+    options
   end
 end

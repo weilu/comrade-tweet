@@ -32,14 +32,26 @@ describe HomeController do
 
     it { should be_success }
 
-    it "queries twitter for direct messages that are newer than the user's newest dm in db" do
-      Message.destroy_all
-      FactoryGirl.create(:message, twitter_id: 1234567, user: current_user)
-      FactoryGirl.create(:message, twitter_id: 2234569)
-      fake_client.should_receive(:direct_messages).with(since_id: 1234567, count: 200)
-      fake_client.should_receive(:mentions_timeline).with(since_id: 1234567, count: 200)
+    describe 'queries twitter for DM and mentions' do
+      it "queries twitter for direct messages that are newer than the user's newest dm in db" do
+          Message.destroy_all
+          FactoryGirl.create(:message, twitter_id: 1234567, user: current_user)
+          FactoryGirl.create(:message, twitter_id: 2234569)
+          fake_client.should_receive(:direct_messages).with(since_id: 1234567, count: 200)
+          fake_client.should_receive(:mentions_timeline).with(since_id: 1234567, count: 200)
 
-      do_request
+          do_request
+      end
+
+      context 'when user has no stored message' do
+        it 'does not query with since_id' do
+          Message.destroy_all
+          fake_client.should_receive(:direct_messages).with(count: 200)
+          fake_client.should_receive(:mentions_timeline).with(count: 200)
+
+          do_request
+        end
+      end
     end
 
     it 'stores filtered messages and senders in the database' do
