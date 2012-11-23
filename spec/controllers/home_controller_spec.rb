@@ -36,8 +36,8 @@ describe HomeController do
       Message.destroy_all
       FactoryGirl.create(:message, twitter_id: 1234567, user: current_user)
       FactoryGirl.create(:message, twitter_id: 2234569)
-      fake_client.should_receive(:direct_messages).with(since_id: 1234567)
-      fake_client.should_receive(:mentions_timeline).with(since_id: 1234567)
+      fake_client.should_receive(:direct_messages).with(since_id: 1234567, count: 200)
+      fake_client.should_receive(:mentions_timeline).with(since_id: 1234567, count: 200)
 
       do_request
     end

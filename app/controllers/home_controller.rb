@@ -29,11 +29,11 @@ class HomeController < ApplicationController
   end
 
   def new_messages
-    client.direct_messages(since_id: current_user.last_stored_message_id)
+    client.direct_messages(since_id: current_user.last_stored_message_id, count: 200)
   end
 
   def new_mentions
-    client.mentions_timeline(since_id: current_user.last_stored_message_id)
+    client.mentions_timeline(since_id: current_user.last_stored_message_id, count: 200)
   end
 
   def save_messages_and_senders twitter_messages
